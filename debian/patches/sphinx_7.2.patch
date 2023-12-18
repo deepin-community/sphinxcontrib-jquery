@@ -1,0 +1,34 @@
+From: Daniel Garcia Moreno <daniel.garcia@suse.com>
+Date: Mon, 4 Sep 2023 13:55:55 +0200
+Subject: Make the tests pass with Sphinx 7.2
+
+This patch adapts the tests to work with Sphinx 7.2.
+Modified for Debian to keep support for older Sphinx versions.
+
+Origin: https://github.com/sphinx-contrib/jquery/pull/27
+---
+ tests/test_jquery_installed.py | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_jquery_installed.py b/tests/test_jquery_installed.py
+index d0537d0..fba60fc 100644
+--- a/tests/test_jquery_installed.py
++++ b/tests/test_jquery_installed.py
+@@ -25,10 +25,13 @@ def run_blank_app(srcdir, **kwargs):
+ 
+ @pytest.fixture(scope="function")
+ def blank_app(tmpdir, monkeypatch):
+-    def inner(**kwargs):
+-        return run_blank_app(path(tmpdir), **kwargs)
+-
+-    monkeypatch.setattr("sphinx.application.abspath", lambda x: x)
++    if sphinx.version_info >= (7, 2):
++        def inner(**kwargs):
++            return run_blank_app(Path(tmpdir), **kwargs)
++    else:
++        def inner(**kwargs):
++            return run_blank_app(path(tmpdir), **kwargs)
++        monkeypatch.setattr("sphinx.application.abspath", lambda x: x)
+     yield inner
+ 
+ 
